@@ -1,0 +1,19 @@
+{
+  "airtable_api": "input_your_personal_access_token_here",
+  "base_id": "appBDr8eF3af5CrHI",
+  "tables": [
+    {
+      "table_name": "sites",
+      "table_id": "tblJm1LB7GAw10jXv"
+    },
+    {
+      "table_name": "contents",
+      "table_id": "tblFDPsjNmsYX6Lpv"
+    },
+    {
+      "table_name": "apps",
+      "table_id": "tbl7p89FjlJQwm3wE"
+    }
+  ],
+  "output_dir": "data"
+}
