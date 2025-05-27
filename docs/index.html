@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airtable Export to JSON</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: system-ui, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #ffffff;
+    }
+    pre, code {
+      background-color: #1e1e1e;
+      color: #dcdcdc;
+      padding: 0.5rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    pre {
+      padding: 1rem;
+    }
+    a {
+      color: #80cbc4;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #333;
+      margin: 2rem 0;
+    }
+    ul {
+      padding-left: 1.5rem;
+    }
+    .note {
+      background: #1d1d1d;
+      border-left: 4px solid #80cbc4;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Airtable Export to JSON</h1>
+    <p>A simple Python script to export multiple Airtable tables from the same base to JSON files using the <a href="https://github.com/gtalarico/pyairtable" target="_blank">PyAirtable</a> library.<br>
+    It reads configuration from a single <code>airtable.json</code> file, making it ideal for batch exporting multiple tables into local <code>.json</code> files.</p>
+
+    <hr>
+
+    <h2>🔧 Features</h2>
+    <ul>
+      <li>No CLI arguments required — just run the script</li>
+      <li>Exports each Airtable table to its own file (e.g., <code>sites.json</code>, <code>contents.json</code>)</li>
+      <li>Automatically creates output directories</li>
+      <li>Prints execution time per table and total script duration</li>
+      <li>Designed for automation (e.g., Cronicle or cron jobs)</li>
+    </ul>
+
+    <hr>
+
+    <h2>📁 Example Output</h2>
+    <p>If your <code>airtable.json</code> looks like this:</p>
+    <pre><code>{
+  "airtable_api": "input_your_personal_access_token_here",
+  "base_id": "appBDr8eF3af5CrHI",
+  "tables": [
+    {
+      "table_name": "sites",
+      "table_id": "tblJm1LB7GAw10jXv"
+    },
+    {
+      "table_name": "contents",
+      "table_id": "tblFDPsjNmsYX6Lpv"
+    },
+    {
+      "table_name": "apps",
+      "table_id": "tbl7p89FjlJQwm3wE"
+    }
+  ],
+  "output_dir": "data"
+}</code></pre>
+
+    <p>The script will save:</p>
+    <pre><code>data/sites.json
+data/contents.json
+data/apps.json</code></pre>
+
+    <p>👉 The <code>"table_name"</code> field determines the filename. For example:</p>
+    <pre><code>{ "table_name": "sites" } → data/sites.json</code></pre>
+
+    <hr>
+
+    <h2>🚀 Getting Started</h2>
+
+    <h3>1. Clone the Repo</h3>
+    <pre><code>git clone https://github.com/deuts/airtable-json-export.git my-custom-folder
+cd my-custom-folder</code></pre>
+
+    <h3>2. Install Requirements</h3>
+    <p>This script uses <a href="https://github.com/gtalarico/pyairtable" target="_blank">PyAirtable</a>:</p>
+    <pre><code>pip install pyairtable</code></pre>
+
+    <h3>3. Set Up <code>airtable.json</code></h3>
+    <p>Rename the provided sample config:</p>
+    <pre><code>cp sample-airtable.json airtable.json</code></pre>
+
+    <p>Then edit <code>airtable.json</code> with your own credentials and table settings.</p>
+
+    <div class="note">
+      <strong>How to find your values:</strong><br><br>
+      <ul>
+        <li><strong>Airtable API Token</strong>: Go to <a href="https://airtable.com/account" target="_blank">airtable.com/account</a>, scroll to <em>"Developer Hub"</em> → <em>"Personal Access Tokens"</em>. Create a token with at least <code>data.records:read</code> access to your base.</li>
+        <li><strong>Base ID</strong> and <strong>Table ID</strong>: From the Airtable URL:
+          <pre><code>https://airtable.com/appBDr8eF3af5CrHI/tblJm1LB7GAw10jXv/viwxyz...</code></pre>
+          <ul>
+            <li><code>appBDr8eF3af5CrHI</code> is the <strong>base_id</strong></li>
+            <li><code>tblJm1LB7GAw10jXv</code> is the <strong>table_id</strong></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <p>🔁 Repeat this for every table you want to export and add them to the <code>tables</code> list.</p>
+
+    <hr>
+
+    <h2>📦 Usage</h2>
+    <p>Once your <code>airtable.json</code> is configured:</p>
+    <pre><code>python get_airtable_data.py</code></pre>
+
+    <p>You’ll see output like this:</p>
+    <pre><code>→ Fetching: sites
+✓ Saved 42 records to data/sites.json in 1.15 seconds
+
+→ Fetching: contents
+✓ Saved 35 records to data/contents.json in 0.95 seconds
+
+→ Fetching: apps
+✓ Saved 10 records to data/apps.json in 0.43 seconds
+
+Script finished in 2.56 seconds
+✓ All tables processed successfully.</code></pre>
+
+    <p>The script will exit with code <code>0</code> on success and <code>1</code> on failure — useful for integration with automation tools like Cronicle or cron jobs.</p>
+
+    <hr>
+
+    <h2>📝 Notes</h2>
+    <ul>
+      <li>This script does <strong>not</strong> update or write to Airtable — it only <strong>reads and exports</strong> data.</li>
+      <li>Ensure your Airtable token has access to the base you indicated.</li>
+      <li>Output files are <strong>overwritten</strong> on every run.</li>
+    </ul>
+
+    <hr>
+
+    <h2>📂 File Structure</h2>
+    <pre><code>airtable-json-export/
+├── get_airtable_data.py        ← main script
+├── sample-airtable.json        ← sample config
+├── airtable.json               ← your real config (add this yourself)
+└── data/                       ← JSON output goes here</code></pre>
+  </div>
+</body>
+</html>
