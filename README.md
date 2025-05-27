@@ -62,7 +62,7 @@ data/apps.json
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/airtable-json-export.git my-custom-folder
+git clone https://github.com/deuts/airtable-json-export.git my-custom-folder
 cd my-custom-folder
 ```
 
