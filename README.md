@@ -62,8 +62,8 @@ data/apps.json
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/airtable-json-export.git
-cd airtable-json-export
+git clone https://github.com/your-username/airtable-json-export.git my-custom-folder
+cd my-custom-folder
 ```
 
 ### 2. Install Requirements
