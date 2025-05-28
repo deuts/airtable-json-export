@@ -15,10 +15,38 @@ def load_config(config_file='airtable.json'):
 def ensure_dir(path):
   os.makedirs(os.path.dirname(path), exist_ok=True)
 
-def fetch_table(api, base_id, table_id):
+def fetch_comments(table, record_id):
+  try:
+    comments = table.comments(record_id)
+    return [
+      {
+        "id": c.id,
+        "text": c.text,
+        "created_time": c.created_time.isoformat(),
+        "author": {
+          "id": c.author.id,
+          "name": c.author.name,
+          "email": c.author.email
+        }
+      }
+      for c in comments
+    ]
+  except Exception as e:
+    print(f"[WARN] Failed to fetch comments for record {record_id}: {e}")
+    return []
+
+def fetch_table(api, base_id, table_id, include_comments=False):
   table = api.table(base_id, table_id)
   records = table.all()
-  return [{"id": record["id"], **record["fields"]} for record in records]
+  results = []
+
+  for record in records:
+    record_data = {"id": record["id"], **record["fields"]}
+    if include_comments:
+      record_data["__comments"] = fetch_comments(table, record["id"])
+    results.append(record_data)
+
+  return results
 
 def main():
   start_time = time.time()
@@ -32,6 +60,7 @@ def main():
   base_id = config.get("base_id")
   tables = config.get("tables", [])
   output_dir = config.get("output_dir", "data")
+  fetch_comments_flag = config.get("fetch_comments", False)
 
   if not all([api_key, base_id, tables]):
     print("[ERROR] Missing required fields in airtable.json")
@@ -52,11 +81,11 @@ def main():
     output_path = os.path.join(output_dir, f"{table_name}.json")
     ensure_dir(output_path)
 
-    print(f"→ Fetching: {table_name}")
+    print(f"→ Fetching: {table_name} {'(with comments)' if fetch_comments_flag else ''}")
     table_start = time.time()
 
     try:
-      data = fetch_table(api, base_id, table_id)
+      data = fetch_table(api, base_id, table_id, include_comments=fetch_comments_flag)
       with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
       elapsed = time.time() - table_start

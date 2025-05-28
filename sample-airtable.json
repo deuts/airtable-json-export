@@ -15,5 +15,6 @@
       "table_id": "tbl7p89FjlJQwm3wE"
     }
   ],
-  "output_dir": "data"
+  "output_dir": "data",
+  "fetch_comments": true
 }

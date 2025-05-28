@@ -1,17 +1,17 @@
 # Airtable Export to JSON
 
-A simple Python script to export multiple Airtable tables from the same base to JSON files using the [PyAirtable](https://github.com/gtalarico/pyairtable) library.  
-It reads configuration from a single `airtable.json` file, making it ideal for batch exporting multiple tables into local `.json` files.
+A simple Python script to export multiple Airtable tables from the same base to JSON files using the [PyAirtable](https://github.com/gtalarico/pyairtable) library. It reads configuration from a single `airtable.json` file, making it ideal for batch exporting multiple tables into local `.json` files.
 
 ---
 
 ## 🔧 Features
 
-- No CLI arguments required — just run the script
-- Exports each Airtable table to its own file (e.g., `sites.json`, `contents.json`)
-- Automatically creates output directories
-- Prints execution time per table and total script duration
-- Designed for automation (e.g., Cronicle or cron jobs)
+* No CLI arguments required — just run the script
+* Exports each Airtable table to its own file (e.g., `sites.json`, `contents.json`)
+* Automatically creates output directories
+* Optionally includes Airtable record comments
+* Prints execution time per table and total script duration
+* Designed for automation (e.g., Cronicle or cron jobs)
 
 ---
 
@@ -23,6 +23,7 @@ If your `airtable.json` looks like this:
 {
   "airtable_api": "input_your_personal_access_token_here",
   "base_id": "appBDr8eF3af5CrHI",
+  "fetch_comments": true,
   "tables": [
     {
       "table_name": "sites",
@@ -39,7 +40,7 @@ If your `airtable.json` looks like this:
   ],
   "output_dir": "data"
 }
-````
+```
 
 The script will save:
 
@@ -53,6 +54,28 @@ data/apps.json
 
 ```json
 { "table_name": "sites" } → data/sites.json
+```
+
+If `fetch_comments` is set to `true`, each record in the output will also include a `__comments` field, like:
+
+```json
+{
+  "id": "recXYZ...",
+  "Name": "Sample Site",
+  "Status": "Active",
+  "__comments": [
+    {
+      "id": "com123...",
+      "text": "This is a comment",
+      "created_time": "2024-11-11T14:23:45.000Z",
+      "author": {
+        "id": "usr123...",
+        "name": "Jane Doe",
+        "email": "jane@example.com"
+      }
+    }
+  ]
+}
 ```
 
 ---
@@ -115,16 +138,16 @@ python get_airtable_data.py
 You’ll see output like this:
 
 ```
-→ Fetching: sites
-✓ Saved 42 records to data/sites.json in 1.15 seconds
+→ Fetching: sites (with comments)
+✓ Saved 42 records to data/sites.json in 3.75 seconds
 
-→ Fetching: contents
-✓ Saved 35 records to data/contents.json in 0.95 seconds
+→ Fetching: contents (with comments)
+✓ Saved 35 records to data/contents.json in 2.94 seconds
 
-→ Fetching: apps
-✓ Saved 10 records to data/apps.json in 0.43 seconds
+→ Fetching: apps (with comments)
+✓ Saved 10 records to data/apps.json in 1.27 seconds
 
-Script finished in 2.56 seconds
+Script finished in 7.96 seconds
 ✓ All tables processed successfully.
 ```
 
@@ -135,6 +158,7 @@ The script will exit with code `0` on success and `1` on failure — useful for 
 ## 📝 Notes
 
 * This script does **not** update or write to Airtable — it only **reads and exports** data.
+* Comments are fetched only when `fetch_comments` is set to `true` — disable it to speed up large exports.
 * Ensure your Airtable token has access to the base you indicated.
 * Output files are **overwritten** on every run.
 
